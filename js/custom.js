@@ -28,16 +28,16 @@ var ViewModel = function () {
 
   // open the info box when user click on the item
   self.openInfobox = function(data,event) {
-    var place = event.target.getAttribute('name');;
+    var place = event.target.getAttribute('name');
     openInfobox(place ,self.selectedType());
-  }
+  };
 
   //update markers on the map when user change the dropdown filters
   self.updateMarkers = function () {
     updateMarkers(self.selectedCity(),self.selectedType());
-  }
+  };
 
-}
+};
 
 ko.applyBindings(new ViewModel());
 
@@ -105,7 +105,7 @@ function initMarkers() {
           infowindow.setContent(content);
           infowindow.open(map, marker);
         }); 
-      }
+      };
     })(markers[i],content, i));  
 
     i++;
@@ -153,7 +153,7 @@ function updateMarkers(city,type) {
           infowindow.setContent(content);
           infowindow.open(map, marker);
         }); 
-      }
+      };
     })(markers[index],content, index , i));  
     index++;
     i++;     
@@ -212,7 +212,7 @@ function moreInfo(name, callback) {
           articleStr = articleStr.replace(/ /g, "_");
           url = 'http://en.wikipedia.org/wiki/' + articleStr ;
           list += '<li><a href="'+ url +'">'+ articleStr + '</a></li>';
-        };
+        }
         clearTimeout(wikiRequestTimeout);
         if(typeof callback === "function") callback(list);
       }
