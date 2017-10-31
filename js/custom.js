@@ -88,37 +88,22 @@ function initMarkers() {
       position: intiPlaces[i].position,
       map: map,
       title: intiPlaces[i].name,
+      type: intiPlaces[i].type,
       icon: 'markers/orange_MarkerU.png',  
     });
      
     bounds.extend(markers[i].position);
-    google.maps.event.addListener(markers[i], 'click', (function (marker,content, i) {
-      return function () {
-        //get wiki link:
-        moreInfo(intiPlaces[i].name  , function(list){
-          // content of the info window 
-          content = '<div class="infobox">' +
-                '<div class="infobox-type">Private University</div>' +
-                '<div class="infobox-name">' + intiPlaces[i].name + '</div>' +
-                '<div class="articles">Read More: <br><ul class="list">'+ list +'</ul></div>' +
-                '</div>';
-          infowindow.setContent(content);
-          infowindow.open(map, marker);
-        }); 
-      };
-    })(markers[i],content, i));  
-
+    addInfowindow(markers[i]);
     i++;
-    // to auto center map based on the current markers
-    map.fitBounds(bounds);
-    // map.setZoom(11); 
   }
+  // to auto center map based on the current markers
+   map.fitBounds(bounds);
 }
 
 function updateMarkers(city,type) { 
 
- //remove the current markers on the map
- clearMarkers(); 
+  //remove the current markers on the map
+  clearMarkers(); 
 
   infowindow = new google.maps.InfoWindow();
   var bounds = new google.maps.LatLngBounds();
@@ -136,31 +121,37 @@ function updateMarkers(city,type) {
       position: places[i].position,
       map: map,
       title: places[i].name,
+      type: places[i].type,
       icon: 'markers/' + markerLabel,  
     });
 
     bounds.extend(markers[index].position);
-    google.maps.event.addListener(markers[index], 'click', (function (marker,content, index , i) {
-      return function () {
-        //get wiki link:
-        moreInfo(places[i].name  , function(list){
-          // content of the info window 
-          content = '<div class="infobox">' +
-                '<div class="infobox-type">Private University</div>' +
-                '<div class="infobox-name">' + places[i].name + '</div>' +
-                '<div class="articles">Read More: <br><ul class="list">'+ list +'</ul></div>' +
-                '</div>';
-          infowindow.setContent(content);
-          infowindow.open(map, marker);
-        }); 
-      };
-    })(markers[index],content, index , i));  
+    addInfowindow(markers[index]);
     index++;
     i++;     
   }
   // to auto center map based on the current markers
   map.fitBounds(bounds);
   // map.setZoom(11);
+}
+
+function addInfowindow(marker) {
+  var name = marker.title;
+  var type = marker.type;
+  moreInfo(name , function(list){
+    // content of the info window 
+    content = '<div class="infobox">' +
+                '<div class="infobox-type">' + type + ' University</div>' +
+                '<div class="infobox-name">' + name + '</div>' +
+                '<div class="articles">Read More: <br><ul class="list">'+ list +'</ul></div>' +
+                '</div>';
+    (function(marker, content) {
+      google.maps.event.addListener(marker, "click", function(e) {
+      infowindow.setContent(content);
+      infowindow.open(marker.get('map'), marker);
+      });
+    })(marker, content);
+  });
 }
 
 function clearMarkers() {
@@ -172,34 +163,29 @@ function clearMarkers() {
 function openInfobox(university, type){
 
   moreInfo(university , function(list){
-
     content = '<div class="infobox">' +
             '<div class="infobox-type">' + type + ' University</div>' +
             '<div class="infobox-name">' + university + '</div>' +
             '<div class="articles">Read More: <br><ul class="list">'+ list +'</ul></div>' +
             '</div>';
-
-  for(var i = 0 ; i < markers.length; i++) {
-    // to avoid open multiple info window for the same marker
-    if(markers[i].title == university) {
-      infowindow.setContent(content);
-      infowindow.open(map, markers[i]);
-    }
-  }
-    
+    for(var i = 0 ; i < markers.length; i++) {
+      // to avoid open multiple info window for the same marker
+      if(markers[i].title == university) {
+        infowindow.setContent(content);
+        infowindow.open(map, markers[i]);
+      }
+    }  
   });
 }
 
 
 function moreInfo(name, callback) {
-
   var articleStr;
   var url;
-  list = "";
-
   var wikiRequestTimeout = setTimeout(function(){
      list = "faild to get article about " + name;
-    },8000);
+     if(typeof callback === "function") callback(list);
+    },3000);
 
   var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search='+ name +'&fromat=json&callback=wikiCallback';
     $.ajax({
@@ -207,11 +193,15 @@ function moreInfo(name, callback) {
       dataType: "jsonp",
       success: function(response) {
         var articleList = response[1];
+        var list = "";
         for ( var i = 0 ; i < articleList.length; i++) {
           articleStr = articleList[i];
           articleStr = articleStr.replace(/ /g, "_");
           url = 'http://en.wikipedia.org/wiki/' + articleStr ;
           list += '<li><a href="'+ url +'">'+ articleStr + '</a></li>';
+        }
+        if( list == "" ) {
+          list = "no article about " + name ;
         }
         clearTimeout(wikiRequestTimeout);
         if(typeof callback === "function") callback(list);
