@@ -200,7 +200,7 @@ function moreInfo(name, callback) {
           url = 'http://en.wikipedia.org/wiki/' + articleStr ;
           list += '<li><a href="'+ url +'">'+ articleStr + '</a></li>';
         }
-        if( list == "" ) {
+        if( list === "" ) {
           list = "no article about " + name ;
         }
         clearTimeout(wikiRequestTimeout);
