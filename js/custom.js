@@ -165,6 +165,11 @@ function addInfowindow(marker) {
                 '</div>';
     (function(marker, content) {
       google.maps.event.addListener(marker, "click", function(e) {
+      if (marker.getAnimation() !== null) {
+        marker.setAnimation(null);
+      } else {
+        marker.setAnimation(google.maps.Animation.DROP);
+      }
       infowindow.setContent(content);
       infowindow.open(marker.get('map'), marker);
       });
