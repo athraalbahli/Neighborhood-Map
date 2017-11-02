@@ -24,7 +24,7 @@
         		<select id="uni" data-bind="options: types, value: selectedType, event: { change: updateMarkers }" >
         		</select>
         	</div>
-        	<p><span data-bind="text: selectedType"></span> Universities in <span data-bind="text: selectedCity"></span></p>
+        	<p><span data-bind="text: selectedType"></span> University in <span data-bind="text: selectedCity"></span> City</p>
         	<ul class="uni-list"  data-bind="foreach: locations">
         	 	<!-- ko if: ($data.city ==  $parent.selectedCity() &&  $data.type ==  $parent.selectedType()) ||
                         ($parent.selectedCity() == 'Any' &&  $parent.selectedType() == 'Any') ||
