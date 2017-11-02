@@ -20,10 +20,12 @@ var ViewModel = function () {
                                         { name: 'Dar Al-Hekma University', city: 'Jeddah' , type: 'Private'},
                                       ]);
 
-  this.cities = ko.observableArray(['Riyadh','Dammam','Jeddah']);
-  this.selectedCity = ko.observable('Riyadh');
-  this.types = ko.observableArray(['Public','Private']);
-  this.selectedType = ko.observable('Private');
+  this.cities = ko.observableArray(['Any','Riyadh','Dammam','Jeddah']);
+  //this.selectedCity = ko.observable('Riyadh');
+  this.selectedCity = ko.observable();
+  this.types = ko.observableArray(['Any','Public','Private']);
+  //this.selectedType = ko.observable('Private');
+  this.selectedType = ko.observable();
   this.selectedUni = ko.observable();
 
   // open the info box when user click on the item
@@ -73,23 +75,38 @@ function initMap() {
 }
 
 function initMarkers() {
-  var intiPlaces = [  { position: { lat:24.7958037 ,  lng:46.7091022  }, name: 'Dar Al Uloom University' , city: 'Riyadh' , type: 'Private'} , 
-                      { position: { lat:24.8625975 ,  lng:46.5896516  }, name: 'Al Yamamah University' , city: 'Riyadh' , type: 'Private'} , 
-                      { position: { lat:24.6643015 ,  lng:46.6737777  }, name: 'Alfaisal University' , city: 'Riyadh', type: 'Private'} , 
-                      { position: { lat:24.7683076 ,  lng:46.5882697  }, name: 'Arab Open University' , city: 'Riyadh' , type: 'Private'},
-                      { position: { lat:24.7347419 ,  lng:46.6953868  }, name: 'Prince Sultan University', city: 'Riyadh' , type: 'Private'},
+  var intiPlaces = [  { position: { lat:26.3070876 ,  lng:50.075902  }, name: 'King Fahd University of Petroleum and Minerals' , city: 'Dammam' ,type: 'Public'} ,
+                { position: { lat:26.3855486 ,  lng:50.1829696  }, name: 'Imam Abdulrahman Bin Faisal university' , city: 'Dammam' ,type: 'Public'} ,
+                { position: { lat:26.4505516 ,  lng:50.0794869  }, name: 'Arab Open University', city: 'Dammam' , type: 'Private'} , 
+                { position: { lat:26.373156 ,  lng:49.973539 }, name: 'Alasala University', city: 'Dammam' , type: 'Private'} ,
+                { position: { lat:26.144497 ,   lng:50.0887723  }, name: 'Prince Mohammad bin Fahd University', city: 'Dammam' , type: 'Private'} ,
+                { position: { lat:24.7545024 ,  lng:46.8511286  }, name: 'King Saud bin Abdulaziz University for Health Sciences', city: 'Riyadh' , type: 'Public'},
+                { position: { lat:24.8464613 ,  lng:46.7225421  }, name: 'Princess Nora bint Abdul Rahman University', city: 'Riyadh' , type: 'Public'},
+                { position: { lat:24.716241 ,   lng:46.6169191  }, name: 'King Saud University', city: 'Riyadh' , type: 'Public'},
+                { position: { lat:24.8159067 ,  lng:46.6871576  }, name: 'Imam Muhammad ibn Saud Islamic University', city: 'Riyadh' , type: 'Public'},
+                { position: { lat:24.7958037 ,  lng:46.7091022  }, name: 'Dar Al Uloom University' , city: 'Riyadh' , type: 'Private'} , 
+                { position: { lat:24.8625975 ,  lng:46.5896516  }, name: 'Al Yamamah University' , city: 'Riyadh' , type: 'Private'} , 
+                { position: { lat:24.6643015 ,  lng:46.6737777  }, name: 'Alfaisal University' , city: 'Riyadh', type: 'Private'} , 
+                { position: { lat:24.7683076 ,  lng:46.5882697  }, name: 'Arab Open University' , city: 'Riyadh' , type: 'Private'},
+                { position: { lat:24.7347419 ,  lng:46.6953868  }, name: 'Prince Sultan University', city: 'Riyadh' , type: 'Private'},
+                { position: { lat:21.497678 ,   lng:39.2378814 }, name: 'King Abdulaziz University', city: 'Jeddah' , type: 'Public'},
+                { position: { lat:21.4784724 ,  lng:39.2087293  }, name: 'Effat University', city: 'Jeddah' , type: 'Private'},
+                { position: { lat:21.4886907 ,  lng:39.2283801  }, name: 'Dar Al-Hekma University', city: 'Jeddah' , type: 'Private'}
                     ];
   infowindow = new google.maps.InfoWindow();
   var bounds = new google.maps.LatLngBounds();
+  var type;
   var i = 0;
   while ( i < intiPlaces.length) {
+    intiPlaces[i].type == 'Private' ? markerLabel = 'orange_MarkerU.png' : markerLabel = 'blue_MarkerU.png';
     //create marker for each palce
     markers[i] = new google.maps.Marker({
       position: intiPlaces[i].position,
       map: map,
       title: intiPlaces[i].name,
       type: intiPlaces[i].type,
-      icon: 'markers/orange_MarkerU.png',  
+      animation: google.maps.Animation.DROP,
+      icon: 'markers/' +  markerLabel,  
     });
      
     bounds.extend(markers[i].position);
@@ -113,15 +130,16 @@ function updateMarkers(city,type) {
 
   while (i< places.length) {
     //skip the place if it dose not matche the filteration
-    if (places[i].type !== type  || places[i].city !== city ) { i++ ; continue; }
+    if((places[i].type !== type &&  type !== 'Any') ||  ( places[i].city !== city && city !== 'Any')) { i++ ; continue; }
     // set the marker icon base on the place type
-    type == 'Private' ? markerLabel = 'orange_MarkerU.png' : markerLabel = 'blue_MarkerU.png';
+    places[i].type == 'Private' ? markerLabel = 'orange_MarkerU.png' : markerLabel = 'blue_MarkerU.png';
     //create marker for each palce
     markers[index] = new google.maps.Marker({
       position: places[i].position,
       map: map,
       title: places[i].name,
       type: places[i].type,
+      animation: google.maps.Animation.DROP,
       icon: 'markers/' + markerLabel,  
     });
 
@@ -171,6 +189,12 @@ function openInfobox(university, type){
     for(var i = 0 ; i < markers.length; i++) {
       // to avoid open multiple info window for the same marker
       if(markers[i].title == university) {
+
+        if (markers[i].getAnimation() !== null) {
+          markers[i].setAnimation(null);
+        } else {
+          markers[i].setAnimation(google.maps.Animation.DROP);
+        }
         infowindow.setContent(content);
         infowindow.open(map, markers[i]);
       }
@@ -210,5 +234,8 @@ function moreInfo(name, callback) {
 }
 
 
+function mapError() {
+  alert("Google Maps has failed to load. Please check your internet connection.");
+}
     
 

@@ -8,7 +8,7 @@
   <link href="css/custom.css" rel="stylesheet">
   <script src="js/jQuery.js"></script>
   <script src="js/bootstrap.min.js"></script>
-  <script async  defer src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyCAO3gS0w_rZM_bncIh_hCzyYetUoxOM5Y&v=3&callback=initMap">
+  <script async  defer src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyCAO3gS0w_rZM_bncIh_hCzyYetUoxOM5Y&v=3&callback=initMap" onerror="mapError()">
     </script>
 </head>
 <body>
@@ -26,7 +26,11 @@
         	</div>
         	<p><span data-bind="text: selectedType"></span> Universities in <span data-bind="text: selectedCity"></span></p>
         	<ul class="uni-list"  data-bind="foreach: locations">
-        	 	<!-- ko if: $data.city ==  $parent.selectedCity() &&  $data.type ==  $parent.selectedType() -->
+        	 	<!-- ko if: ($data.city ==  $parent.selectedCity() &&  $data.type ==  $parent.selectedType()) ||
+                        ($parent.selectedCity() == 'Any' &&  $parent.selectedType() == 'Any') ||
+                        ($parent.selectedCity() == 'Any' &&  $data.type ==  $parent.selectedType()) ||
+                        ($parent.selectedType() == 'Any' &&  $data.city ==  $parent.selectedCity()) 
+                         -->
         			<li class="place" data-bind="text: $data.name , attr:{name: $data.name },click: $parent.openInfobox"></li>
     				<!-- /ko -->
         	</ul>
